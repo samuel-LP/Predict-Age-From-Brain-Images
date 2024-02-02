@@ -47,22 +47,20 @@ def _read_data(path, dataset, datatype=['rois', 'vbm']):
 
     """
     # Read target
-    participants = pd.read_csv(os.path.join(
-        path, 'data', "%s_participants.csv" % dataset))
+    participants = pd.read_csv(f"../data/{dataset}_participants.csv")
     y_arr = participants[_target_column_name].values
 
     x_arr_l = []
     # Read ROIs
     if'rois' in datatype:
-        rois = pd.read_csv(os.path.join(
-            path, 'data', "%s_rois.csv" % dataset))
+        rois = pd.read_csv(f"../data/{dataset}_rois.csv")
         x_rois_arr = rois.loc[:, 'l3thVen_GM_Vol':]
         assert x_rois_arr.shape[1] == 284
         x_arr_l.append(x_rois_arr)
 
     # Read 3d images and mask
     if'vbm' in datatype:
-        imgs_arr_zip = np.load(os.path.join(path, 'data', "%s_vbm.npz" % dataset))
+        imgs_arr_zip = np.load(f"../data/{dataset}_vbm.npz")
         x_img_arr = imgs_arr_zip['imgs_arr'].squeeze()
         mask_arr = imgs_arr_zip['mask_arr']
         x_img_arr = x_img_arr[:, mask_arr]
