@@ -25,7 +25,7 @@ def get_cv(X, y):
     cv_train = KFold(n_splits=N_FOLDS, shuffle=True, random_state=0)
     return cv_train.split(X, y)
 
-def _read_data(path, dataset, datatype=['rois', 'vbm']):
+def _read_data(path, dataset, datatype=['rois', 'vbm'], notebook = False):
     """ Read data.
 
     Parameters
@@ -47,20 +47,29 @@ def _read_data(path, dataset, datatype=['rois', 'vbm']):
 
     """
     # Read target
-    participants = pd.read_csv(f"../data/{dataset}_participants.csv")
+    if notebook :
+        participants = pd.read_csv(f"../data/{dataset}_participants.csv")
+    else :
+        participants = pd.read_csv(f"./data/{dataset}_participants.csv")
     y_arr = participants[_target_column_name].values
 
     x_arr_l = []
     # Read ROIs
     if'rois' in datatype:
-        rois = pd.read_csv(f"../data/{dataset}_rois.csv")
+        if notebook :
+            rois = pd.read_csv(f"../data/{dataset}_rois.csv")
+        else :
+            rois = pd.read_csv(f"./data/{dataset}_rois.csv")
         x_rois_arr = rois.loc[:, 'l3thVen_GM_Vol':]
         assert x_rois_arr.shape[1] == 284
         x_arr_l.append(x_rois_arr)
 
     # Read 3d images and mask
     if'vbm' in datatype:
-        imgs_arr_zip = np.load(f"../data/{dataset}_vbm.npz")
+        if notebook :
+            imgs_arr_zip = np.load(f"../data/{dataset}_vbm.npz")
+        else :
+            imgs_arr_zip = np.load(f"./data/{dataset}_vbm.npz")
         x_img_arr = imgs_arr_zip['imgs_arr'].squeeze()
         mask_arr = imgs_arr_zip['mask_arr']
         x_img_arr = x_img_arr[:, mask_arr]
@@ -75,15 +84,14 @@ def _read_data(path, dataset, datatype=['rois', 'vbm']):
     return x_arr, y_arr
 
 
-def get_train_data(path='.', datatype=['rois', 'vbm']):
+def get_train_data(notebook = False, path='.', datatype=['rois', 'vbm']):
     dataset = 'train'
-    return _read_data(path, dataset, datatype)
+    return _read_data(path, dataset, datatype, notebook)
 
 
-def get_test_data(path='.', datatype=['rois', 'vbm']):
+def get_test_data(notebook = False, path='.', datatype=['rois', 'vbm']):
     dataset = 'test'
-    return _read_data(path, dataset, datatype)
+    return _read_data(path, dataset, datatype, notebook)
 
-# x_arr, y_arr = get_train_data()
-# x_arr, y_arr = get_test_data()
+
 

@@ -1,9 +1,5 @@
-import numpy as np
-
-from sklearn.base import BaseEstimator
 from sklearn.base import TransformerMixin
-from sklearn.linear_model import LinearRegression
-from sklearn.linear_model import Ridge
+from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
 from sklearn.base import BaseEstimator
 from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import make_pipeline
@@ -15,7 +11,7 @@ class ROIsFeatureExtractor(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X):
-        return X[:, :284]
+        return X[:, :142]
 
 
 class VBMFeatureExtractor(BaseEstimator, TransformerMixin):
@@ -28,6 +24,10 @@ class VBMFeatureExtractor(BaseEstimator, TransformerMixin):
 
 
 def get_estimator():
-    estimator = make_pipeline(ROIsFeatureExtractor(), StandardScaler(),
-                              LinearRegression())
+    estimator = make_pipeline(ROIsFeatureExtractor(),
+                              StandardScaler(),
+                              GradientBoostingRegressor(learning_rate = 0.01,
+                                                        max_depth= 3,
+                                                        n_estimators= 1000)
+                              )
     return estimator
