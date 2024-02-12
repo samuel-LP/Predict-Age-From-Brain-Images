@@ -1,6 +1,8 @@
 from sklearn.base import TransformerMixin
 from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
 from sklearn.base import BaseEstimator
+from sklearn.gaussian_process import GaussianProcessRegressor
+from sklearn.gaussian_process.kernels import RBF
 from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import make_pipeline
 
@@ -24,10 +26,16 @@ class VBMFeatureExtractor(BaseEstimator, TransformerMixin):
 
 
 def get_estimator():
+    kernel = RBF(
+        length_scale=[1] * 142)  # Ajustez la longueur de la liste selon le nombre de fonctionnalités dans vos données
+    gpr = GaussianProcessRegressor(
+        kernel=kernel,
+        alpha=0.1441108530403702,
+        n_restarts_optimizer=10,
+        normalize_y=True,
+        random_state=1)
+
     estimator = make_pipeline(ROIsFeatureExtractor(),
-                              StandardScaler(),
-                              GradientBoostingRegressor(learning_rate = 0.01,
-                                                        max_depth= 3,
-                                                        n_estimators= 1000)
+                              gpr
                               )
     return estimator
