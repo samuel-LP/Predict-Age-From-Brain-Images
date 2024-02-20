@@ -1,11 +1,13 @@
-import pandas as pd
 from sklearn.base import TransformerMixin
 from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor, StackingRegressor
 from sklearn.base import BaseEstimator
-from sklearn.linear_model import LinearRegression, Lasso
+from sklearn.gaussian_process import GaussianProcessRegressor
+from sklearn.gaussian_process.kernels import RBF
+from sklearn.linear_model import LinearRegression, RidgeCV, Lasso
 from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import make_pipeline
 import numpy as np
+import pandas as pd
 
 
 class ROIsFeatureExtractor(BaseEstimator, TransformerMixin):
@@ -478,33 +480,145 @@ class VBMFeatureExtractor(BaseEstimator, TransformerMixin):
         ROI_train["Vol_GM_autre"] = ROI_train[autre_GM].sum(axis=1)
         ROI_train["Vol_CSF_autre"] = ROI_train[autre_CSF].sum(axis=1)
 
-        ROI_train = ROI_train[["Vol_GM_corticale",
-                               "Vol_CSF_corticale",
-                               "Vol_GM_subcorticale",
-                               "Vol_CSF_subcorticale",
-                               "Vol_GM_liquidien",
-                               "Vol_CSF_liquidien",
-                               "Vol_GM_matblanche",
-                               "Vol_CSF_matblanche",
-                               "Vol_GM_cereb",
-                               "Vol_CSF_cereb",
-                               "Vol_GM_autre",
-                               "Vol_CSF_autre"]]
+        return np.array(ROI_train[ [
+ 'l3thVen_GM_Vol',
+ 'l4thVen_GM_Vol',
+ 'r4thVen_GM_Vol',
+ 'rAmy_GM_Vol',
+ 'lBst_GM_Vol',
+ 'lCau_GM_Vol',
+ 'lExtCbe_GM_Vol',
+ 'rCbeWM_GM_Vol',
+ 'lCbrWM_GM_Vol',
+ 'rCbrWM_GM_Vol',
+ 'lCSF_GM_Vol',
+ 'lHip_GM_Vol',
+ 'rInfLatVen_GM_Vol',
+ 'lLatVen_GM_Vol',
+ 'rLatVen_GM_Vol',
+ 'rPal_GM_Vol',
+ 'lPut_GM_Vol',
+ 'rPut_GM_Vol',
+ 'lThaPro_GM_Vol',
+ 'rThaPro_GM_Vol',
+ 'rVenVen_GM_Vol',
+ 'rOC_GM_Vol',
+ 'lCbeLoCbe1-5_GM_Vol',
+ 'lCbeLoCbe8-10_GM_Vol',
+ 'rAngGy_GM_Vol',
+ 'rCal+Cbr_GM_Vol',
+ 'lCenOpe_GM_Vol',
+ 'lCun_GM_Vol',
+ 'lEnt_GM_Vol',
+ 'rEnt_GM_Vol',
+ 'lFroOpe_GM_Vol',
+ 'lFroPo_GM_Vol',
+ 'rFusGy_GM_Vol',
+ 'rRecGy_GM_Vol',
+ 'lInfOccGy_GM_Vol',
+ 'rInfOccGy_GM_Vol',
+ 'lInfTemGy_GM_Vol',
+ 'lLinGy_GM_Vol',
+ 'lMidCinGy_GM_Vol',
+ 'rMidCinGy_GM_Vol',
+ 'rMedFroCbr_GM_Vol',
+ 'lMidFroGy_GM_Vol',
+ 'lMidOccGy_GM_Vol',
+ 'rMidOccGy_GM_Vol',
+ 'lMedPoCGy_GM_Vol',
+ 'rMedPoCGy_GM_Vol',
+ 'lMidTemGy_GM_Vol',
+ 'lOccPo_GM_Vol',
+ 'lOccFusGy_GM_Vol',
+ 'rOccFusGy_GM_Vol',
+ 'rInfFroGy_GM_Vol',
+ 'lInfFroOrbGy_GM_Vol',
+ 'lPosCinGy_GM_Vol',
+ 'lPCu_GM_Vol',
+ 'rPosIns_GM_Vol',
+ 'rParOpe_GM_Vol',
+ 'rPoCGy_GM_Vol',
+ 'lPosOrbGy_GM_Vol',
+ 'rPrcGy_GM_Vol',
+ 'rTem_GM_Vol',
+ 'lSCA_GM_Vol',
+ 'rSCA_GM_Vol',
+ 'lCbr+Mot_GM_Vol',
+ 'rCbr+Mot_GM_Vol',
+ 'lSupMarGy_GM_Vol',
+ 'lSupOccGy_GM_Vol',
+ 'rSupParLo_GM_Vol',
+ 'lSupTemGy_GM_Vol',
+ 'rSupTemGy_GM_Vol',
+ 'lTemPo_GM_Vol',
+ 'lTemTraGy_GM_Vol',
+ 'l3thVen_CSF_Vol',
+ 'r4thVen_CSF_Vol',
+ 'rAcc_CSF_Vol',
+ 'lAmy_CSF_Vol',
+ 'rAmy_CSF_Vol',
+ 'lExtCbe_CSF_Vol',
+ 'rExtCbe_CSF_Vol',
+ 'rCbeWM_CSF_Vol',
+ 'lCSF_CSF_Vol',
+ 'rInfLatVen_CSF_Vol',
+ 'lLatVen_CSF_Vol',
+ 'lPut_CSF_Vol',
+ 'rPut_CSF_Vol',
+ 'rVenVen_CSF_Vol',
+ 'lCbeLoCbe1-5_CSF_Vol',
+ 'lCbeLoCbe6-7_CSF_Vol',
+ 'lCbeLoCbe8-10_CSF_Vol',
+ 'rCbeLoCbe8-10_CSF_Vol',
+ 'rAntCinGy_CSF_Vol',
+ 'lAntIns_CSF_Vol',
+ 'lAntOrbGy_CSF_Vol',
+ 'rAntOrbGy_CSF_Vol',
+ 'rCal+Cbr_CSF_Vol',
+ 'lCun_CSF_Vol',
+ 'rCun_CSF_Vol',
+ 'rEnt_CSF_Vol',
+ 'lFroOpe_CSF_Vol',
+ 'lFroPo_CSF_Vol',
+ 'lFusGy_CSF_Vol',
+ 'rFusGy_CSF_Vol',
+ 'lRecGy_CSF_Vol',
+ 'rInfOccGy_CSF_Vol',
+ 'rLinGy_CSF_Vol',
+ 'lMidCinGy_CSF_Vol',
+ 'rMidCinGy_CSF_Vol',
+ 'rMidFroGy_CSF_Vol',
+ 'lMedPoCGy_CSF_Vol',
+ 'rMedPoCGy_CSF_Vol',
+ 'rMedPrcGy_CSF_Vol',
+ 'lSupMedFroGy_CSF_Vol',
+ 'lMidTemGy_CSF_Vol',
+ 'rMidTemGy_CSF_Vol',
+ 'rInfFroGy_CSF_Vol',
+ 'rInfFroOrbGy_CSF_Vol',
+ 'lPoCGy_CSF_Vol',
+ 'rPoCGy_CSF_Vol',
+ 'lPosOrbGy_CSF_Vol',
+ 'rPosOrbGy_CSF_Vol',
+ 'lPla_CSF_Vol',
+ 'rPla_CSF_Vol',
+ 'lPrcGy_CSF_Vol',
+ 'rPrcGy_CSF_Vol',
+ 'rSupFroGy_CSF_Vol',
+ 'rCbr+Mot_CSF_Vol',
+ 'lSupMarGy_CSF_Vol',
+ 'lSupOccGy_CSF_Vol',
+ 'lSupParLo_CSF_Vol',
+ 'rSupTemGy_CSF_Vol',
+ 'lTemPo_CSF_Vol',
+ 'lTemTraGy_CSF_Vol',
+ 'rTemTraGy_CSF_Vol']])
 
-        return np.array(ROI_train)
 
 
 def get_estimator():
-    params = {'max_depth': 4, 'subsample': 0.6709616920787047, 'n_estimators': 136, 'alpha': 0.46305260922471636}
-    estimator = make_pipeline(
-        ROIsFeatureExtractor(),
-        StandardScaler(),
-        StackingRegressor(
-            estimators=[
-                ('gradient_boosting', GradientBoostingRegressor(**params)),
-                ('random_forest', RandomForestRegressor(n_estimators=1000, max_depth=15))
-            ],
-            final_estimator=GradientBoostingRegressor(**params))
-        )
+    estimator = make_pipeline(VBMFeatureExtractor(),
+                              StandardScaler(),
+                              Lasso(alpha=0.08581707228921756))
+    return estimator
 
-    return(estimator)

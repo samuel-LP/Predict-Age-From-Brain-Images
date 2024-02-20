@@ -1,11 +1,11 @@
-import pandas as pd
 from sklearn.base import TransformerMixin
-from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor, StackingRegressor
 from sklearn.base import BaseEstimator
-from sklearn.linear_model import LinearRegression, Lasso
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import make_pipeline
 import numpy as np
+import pandas as pd
 
 
 class ROIsFeatureExtractor(BaseEstimator, TransformerMixin):
@@ -478,33 +478,20 @@ class VBMFeatureExtractor(BaseEstimator, TransformerMixin):
         ROI_train["Vol_GM_autre"] = ROI_train[autre_GM].sum(axis=1)
         ROI_train["Vol_CSF_autre"] = ROI_train[autre_CSF].sum(axis=1)
 
-        ROI_train = ROI_train[["Vol_GM_corticale",
-                               "Vol_CSF_corticale",
-                               "Vol_GM_subcorticale",
-                               "Vol_CSF_subcorticale",
-                               "Vol_GM_liquidien",
-                               "Vol_CSF_liquidien",
-                               "Vol_GM_matblanche",
-                               "Vol_CSF_matblanche",
-                               "Vol_GM_cereb",
-                               "Vol_CSF_cereb",
-                               "Vol_GM_autre",
-                               "Vol_CSF_autre"]]
+        return np.array(ROI_train[ ['Vol_GM_corticale', 'lMidTemGy_GM_Vol', 'rPosIns_CSF_Vol',
+       'lThaPro_GM_Vol', 'lCau_GM_Vol', 'rBst_GM_Vol', 'lBst_GM_Vol',
+       'rInfFroGy_CSF_Vol', 'lExtCbe_CSF_Vol', 'rBasCbr+FobBr_GM_Vol',
+       'lPut_GM_Vol', 'rEnt_CSF_Vol', 'rSCA_GM_Vol', 'rPal_GM_Vol',
+       'lFroOpe_GM_Vol', 'Vol_CSF_cereb', 'rInfTemGy_CSF_Vol',
+       'rMidFroGy_GM_Vol', 'lPrcGy_CSF_Vol', 'lAngGy_CSF_Vol', 'rPla_CSF_Vol',
+       'lMedPoCGy_CSF_Vol', 'rSupFroGy_CSF_Vol', 'lFusGy_CSF_Vol',
+       'rPrcGy_GM_Vol', 'rMidTemGy_GM_Vol']])
 
-        return np.array(ROI_train)
 
 
 def get_estimator():
-    params = {'max_depth': 4, 'subsample': 0.6709616920787047, 'n_estimators': 136, 'alpha': 0.46305260922471636}
-    estimator = make_pipeline(
-        ROIsFeatureExtractor(),
-        StandardScaler(),
-        StackingRegressor(
-            estimators=[
-                ('gradient_boosting', GradientBoostingRegressor(**params)),
-                ('random_forest', RandomForestRegressor(n_estimators=1000, max_depth=15))
-            ],
-            final_estimator=GradientBoostingRegressor(**params))
-        )
+    params = {'max_depth': 13, 'n_estimators': 149, 'min_samples_split': 3, 'min_samples_leaf': 1, 'max_features': 12}
+    estimator = make_pipeline(VBMFeatureExtractor(),
+                              RandomForestRegressor(**params))
+    return estimator
 
-    return(estimator)
